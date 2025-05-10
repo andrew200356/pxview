@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, Image, Dimensions } from 'react-native';
 import HtmlView from 'react-native-htmlview';
 import { Text } from 'react-native-paper';
 import PXTabView from './PXTabView';
+import PXCacheImage from './PXCacheImage';
 import { MODAL_TYPES } from '../common/constants';
 import { globalStyleVariables } from '../styles';
 
@@ -20,6 +21,12 @@ const styles = StyleSheet.create({
   pageLink: {
     fontWeight: '500',
     color: '#007AFF',
+  },
+  novelImage: {
+    width: '100%',
+    height: 250,
+    marginVertical: 10,
+    resizeMode: 'contain',
   },
 });
 
@@ -69,6 +76,27 @@ class NovelViewer extends Component {
         >
           {defaultRenderer(node.children, parent)}
         </Text>
+      );
+    }
+    // Handle image tags in novel content
+    if (node.name === 'img' && node.attribs && node.attribs.src) {
+      const imgSrc = node.attribs.src;
+      // Some Pixiv novel images use a special format, we need to handle both regular URLs and Pixiv-specific ones
+      // Convert Pixiv novel image URLs if needed
+      const pixivImgRegex = /^\/novel\/img\/(.+)$/;
+      const match = imgSrc.match(pixivImgRegex);
+      
+      const finalImageUrl = match 
+        ? `https://i.pximg.net/novel-cover-original/img/${match[1]}` 
+        : imgSrc;
+
+      return (
+        <View key={index} style={{ alignItems: 'center' }}>
+          <PXCacheImage 
+            uri={finalImageUrl} 
+            style={styles.novelImage}
+          />
+        </View>
       );
     }
     // other nodes render by default renderer
