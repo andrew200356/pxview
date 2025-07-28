@@ -34,12 +34,17 @@ export function* handleEditAccount(action) {
   } catch (err) {
     const errors = err && err.body && err.body.validation_errors;
     if (errors) {
-      const { old_password, password, pixiv_id, mail_address } = errors;
+      const {
+        old_password: oldPassword,
+        password: passwordError,
+        pixiv_id: pixivIdError,
+        mail_address: mailAddressError,
+      } = errors;
       const validationErrors = {
-        currentPassword: old_password,
-        newPassword: password,
-        pixivId: pixiv_id,
-        email: mail_address,
+        currentPassword: oldPassword,
+        newPassword: passwordError,
+        pixivId: pixivIdError,
+        email: mailAddressError,
       };
       yield put(editAccountFailure(validationErrors));
     } else {

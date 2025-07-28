@@ -1,6 +1,4 @@
-import { takeEvery, call, put } from 'redux-saga/effects';
-import { showMessage } from 'react-native-flash-message';
-import { clearError } from '../actions/error';
+import { takeEvery } from 'redux-saga/effects';
 import { ERROR } from '../constants/actionTypes';
 
 // todo

@@ -9,16 +9,26 @@ import HeaderSettingsButton from '../../components/HeaderSettingsButton';
 import Loader from '../../components/Loader';
 import * as novelTextActionCreators from '../../common/actions/novelText';
 import * as modalActionCreators from '../../common/actions/modal';
-import { makeGetParsedNovelText } from '../../common/selectors';
+import * as readingProgressActionCreators from '../../common/actions/readingProgress';
+import {
+  makeGetParsedNovelText,
+  makeGetNovelReadingProgress,
+} from '../../common/selectors';
 import { MODAL_TYPES, READING_DIRECTION_TYPES } from '../../common/constants';
 import { globalStyles } from '../../styles';
 
 class NovelReader extends Component {
   constructor(props) {
     super(props);
-    const { novelReadingDirection, parsedNovelText } = props;
+    const { novelReadingDirection, parsedNovelText, readingProgress } = props;
     let state;
-    if (parsedNovelText) {
+
+    // Initialize with reading progress if available
+    if (readingProgress && readingProgress.chapterIndex !== undefined) {
+      state = {
+        index: readingProgress.chapterIndex,
+      };
+    } else if (parsedNovelText) {
       if (novelReadingDirection === READING_DIRECTION_TYPES.RIGHT_TO_LEFT) {
         state = {
           index: parsedNovelText.length - 1,
@@ -47,14 +57,30 @@ class NovelReader extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { novelReadingDirection, parsedNovelText } = this.props;
-    const { parsedNovelText: prevParsedNovelText } = prevProps;
+    const {
+      novelReadingDirection,
+      parsedNovelText,
+      readingProgress,
+    } = this.props;
+    const {
+      parsedNovelText: prevParsedNovelText,
+      readingProgress: prevReadingProgress,
+    } = prevProps;
+
     if (parsedNovelText && !prevParsedNovelText) {
-      this.setState({
-        index:
+      // Initialize with reading progress if available, otherwise use default
+      let initialIndex;
+      if (readingProgress && readingProgress.chapterIndex !== undefined) {
+        initialIndex = readingProgress.chapterIndex;
+      } else {
+        initialIndex =
           novelReadingDirection === READING_DIRECTION_TYPES.RIGHT_TO_LEFT
             ? parsedNovelText.length - 1
-            : 0,
+            : 0;
+      }
+
+      this.setState({
+        index: initialIndex,
       });
     }
   }
@@ -77,6 +103,18 @@ class NovelReader extends Component {
   handleOnPressOpenSettings = () => {
     const { openModal } = this.props;
     openModal(MODAL_TYPES.NOVEL_SETTINGS);
+  };
+
+  handleSaveProgress = async (novelId, progress) => {
+    const { setReadingProgress } = this.props;
+    try {
+      // Save to Redux store (which will persist via redux-persist)
+      setReadingProgress(novelId, progress);
+      return true;
+    } catch (error) {
+      console.error('Failed to save reading progress:', error);
+      return false;
+    }
   };
 
   renderHeaderTitle = () => {
@@ -133,6 +171,8 @@ class NovelReader extends Component {
             lineHeight={lineHeight}
             onIndexChange={this.handleOnIndexChange}
             onPressPageLink={this.handleOnPressPageLink}
+            onSaveProgress={this.handleSaveProgress}
+            initialProgress={this.props.readingProgress}
           />
         )}
       </View>
@@ -144,19 +184,26 @@ export default withTheme(
   connect(
     () => {
       const getParsedNovelText = makeGetParsedNovelText();
+      const getNovelReadingProgress = makeGetNovelReadingProgress();
       return (state, props) => {
         const { novelText, novelSettings, readingSettings } = state;
         const parsedNovelText = getParsedNovelText(state, props);
         const novelId = props.novelId || props.route.params.novelId;
+        const readingProgress = getNovelReadingProgress(state, props);
         return {
           novelText: novelText[novelId],
           novelId,
           parsedNovelText,
           novelSettings,
           novelReadingDirection: readingSettings.novelReadingDirection,
+          readingProgress,
         };
       };
     },
-    { ...novelTextActionCreators, ...modalActionCreators },
+    {
+      ...novelTextActionCreators,
+      ...modalActionCreators,
+      ...readingProgressActionCreators,
+    },
   )(NovelReader),
 );

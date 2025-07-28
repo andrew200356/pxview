@@ -1,4 +1,4 @@
-# PxView
+****# PxView
 ![logo](./src/images/logo.png)
 
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
@@ -6,7 +6,7 @@
 
 PxView also know as PxView R is an unofficial Pixiv app client for Android and iOS, built with React Native.
 
-
+****
 ## Screenshots
 ![android_recommended](./screenshots/android/1.png)
 ![android_search](./screenshots/android/2.png)

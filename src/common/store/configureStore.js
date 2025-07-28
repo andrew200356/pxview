@@ -277,6 +277,7 @@ export default function configureStore() {
       'novelSettings',
       'likeButtonSettings',
       'readingSettings',
+      'readingProgress',
       'trendingSearchSettings',
       'entities',
       'auth',

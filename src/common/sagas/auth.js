@@ -18,7 +18,6 @@ import {
   loginFailure,
   signUpSuccess,
   signUpFailure,
-  logout,
   refreshAccessToken,
   refreshAccessTokenSuccess,
   refreshAccessTokenFailure,

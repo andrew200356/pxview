@@ -483,3 +483,9 @@ export const MUTE_SETTINGS = defineAction(
 export const THEME = defineAction('THEME', [SET, RESTORE], appNamespace);
 
 export const MODAL = defineAction('MODAL', [OPEN, CLOSE], appNamespace);
+
+export const READING_PROGRESS = defineAction(
+  'READING_PROGRESS',
+  [SET, RESTORE, CLEAR],
+  appNamespace,
+);

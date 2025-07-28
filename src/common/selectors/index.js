@@ -142,6 +142,7 @@ const selectMuteTags = (state) => state.muteTags.items;
 const selectMuteUsers = (state) => state.muteUsers.items;
 
 const selectReadingSettings = (state) => state.readingSettings;
+const selectReadingProgress = (state) => state.readingProgress;
 
 export const getAuth = (state) => state.auth;
 export const getAuthUser = (state) => state.auth.user;
@@ -1280,3 +1281,19 @@ export const getMuteUsersItems = createMuteUserItemsSelector(
   [selectMuteUsers, selectEntities],
   (muteUsers, entities) => denormalize(muteUsers, Schemas.USER_ARRAY, entities),
 );
+
+// Reading Progress Selectors
+export const getReadingProgress = (state) => state.readingProgress.items;
+
+export const makeGetNovelReadingProgress = () =>
+  createSelector(
+    [selectReadingProgress, getProps],
+    (readingProgress, props) => {
+      const novelId = props.novelId || props.route?.params?.novelId;
+      return novelId ? readingProgress.items[novelId] : null;
+    },
+  );
+
+export const getReadingProgressForNovel = (state, novelId) => {
+  return state.readingProgress.items[novelId] || null;
+};

@@ -1,4 +1,4 @@
-import { all, fork } from 'redux-saga/effects';
+import { all } from 'redux-saga/effects';
 import { networkSaga } from 'react-native-offline';
 import {
   watchLoginRequest,
